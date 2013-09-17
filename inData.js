@@ -40,10 +40,6 @@ function start() {
     dateDir = argumentsArr[dateIndex];
     langs = fs.readdirSync(dir + dateDir + '/');
     langs = ignoreArr(langs);
-    if (db) {
-        db.close();
-    }
-    db = new sqlite3.Database(dateDir + '.db');
     i = 0;
     nextfile();
 }
@@ -78,7 +74,7 @@ function exec(strs, cb) {
             'data': ldata,
             'mouse': mouse
         };
-        db.run("INSERT INTO tb_" + lang + " VALUES (?,?)", [uid, JSON.stringify(item)]);
+        db.run("INSERT INTO tb_" + dateDir + " VALUES (?,?)", [uid, JSON.stringify(item)]);
         acc++;
         sleepacc++;
         allacc++;
@@ -103,6 +99,10 @@ function nextfile() {
         start();
         return 0;
     }
+    if (db) {
+        db.close();
+    }
+    db = new sqlite3.Database(langs[i] + '.db');
     var path = dir + dateDir + '/' + langs[i] + '/' + dateDir + '_monthlogin_' + langs[i] + '.log';
     allacc = 0;
     console.log("Start read:" + path);
@@ -112,8 +112,8 @@ function nextfile() {
             process.exit();
         }
         if (row.length == 0) {
-            db.run("CREATE TABLE " + 'tb_' + langs[i] + " (uid varchar(255), data text)");
-            console.log('CREATE TABLE: tb_' + langs[i]);
+            db.run("CREATE TABLE " + 'tb_' + dateDir + " (uid varchar(255), data text)");
+            console.log('CREATE TABLE: tb_' + dateDir);
         }
         i++;
         openfile(path);
