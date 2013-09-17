@@ -5,41 +5,46 @@
  * Time: 上午11:30
  * To change this template use File | Settings | File Templates.
  */
-var ndir = require('ndir');
 var fs = require('fs');
 var lineReader = require('line-reader');
 var util = require('util');
-
-var arguments = process.argv.splice(2);
-if (arguments.length < 1) {
+var sqlite3 = require('sqlite3').verbose();
+var argumentsArr = process.argv.splice(2);
+if (argumentsArr.length < 1) {
     console.log('arguments error!');
     return;
 }
 
-var dir = '/Work/StromWorkSpace/alog-redis/logData/';
+//var dir = '/Work/StromWorkSpace/alog-redis/logData/';
+var dir = '/mnt/farmweblog3/monthlogin/';
 var dateIndex = 0;
+var dateDir;
 var langs;
 var timeo = getTimeoffset();
-var redis = require("redis");
-var client = redis.createClient();
 var acc = 0;
+var i = 0;
+var db;
 var sleepacc = 0;
-client.on('ready', function () {
-    dateIndex = 0;
-    start();
-});
-setInterval(debuginfo, 10000);
+
+dateIndex = 0;
+start();
+setInterval(debuginfo, 4000);
 //开始执行
 function start() {
-    if (dateIndex == arguments.length) {
+    if (dateIndex == argumentsArr.length) {
         console.log('Over:' + new Date().toString());
     }
-    langs = fs.readdirSync(dir + debug_args + '/');
+    dateDir = argumentsArr[dateIndex];
+    langs = fs.readdirSync(dir + dateDir + '/');
     langs = ignoreArr(langs);
+    if (db) {
+        db.close();
+    }
+    db = new sqlite3.Database(dateDir + '.db');
     nextfile();
 }
 function debuginfo() {
-    console.log('men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 10));
+    console.log('men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 4));
     acc = 0;
 }
 function exec(strs, cb) {
@@ -69,27 +74,15 @@ function exec(strs, cb) {
             'data': ldata,
             'mouse': mouse
         };
-        client.hget(lang, uid, function (err, data) {
-            if (err) {
-                console.log(err);
-                cb();
-                return 0;
-            }
-            var allData = {};
-            if (data) {
-                allData = JSON.parse(data);
-            }
-            allData[logtime] = item;
-            client.hset(lang, uid, JSON.stringify(allData));
-            sleepacc++;
-            if (sleepacc > 999) {
-                sleepacc = 0;
-                setTimeout(cb, 100);
-            } else {
-                cb();
-            }
-        });
-
+        db.run("INSERT INTO tb_" + lang + " VALUES (?,?)", [uid, JSON.stringify(item)]);
+        acc++;
+        sleepacc++;
+        if (sleepacc > 999) {
+            sleepacc = 0;
+            setTimeout(cb, 1000);
+        } else {
+            cb();
+        }
     }
     catch (err) {
         console.log(err + " # " + strs);
@@ -105,21 +98,33 @@ function nextfile() {
         process.exit();
         return 0;
     }
-    var path = dir + debug_args + '/' + langs[i] + '/' + debug_args + '_monthlogin_' + langs[i] + '.log';
-    i++;
+    var path = dir + dateDir + '/' + langs[i] + '/' + dateDir + '_monthlogin_' + langs[i] + '.log';
+
     console.log("Start read:" + path);
-    openfile(path);
+    db.all("select * from sqlite_master where name=?", ['tb_' + langs[i]], function (err, row) {
+        if (err) {
+            console.log('err1' + err);
+            process.exit();
+        }
+        if (row.length == 0) {
+            db.run("CREATE TABLE " + 'tb_' + langs[i] + " (uid varchar(255), data text)");
+            console.log('创建表: tb_' + langs[i]);
+        }
+        i++;
+        openfile(path);
+
+    });
+
 }
 
 //开始打开文件
 function openfile(filename) {
     lineReader.eachLine(filename, function (line, last, cb) {
-        //console.log(line);
         acc++;
         exec(line, function () {
             if (last) {
                 cb(false);
-                setTimeout(nextfile, 10000);
+                setTimeout(nextfile, 1000);
                 return;
             }
             cb();
