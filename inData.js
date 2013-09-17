@@ -14,7 +14,7 @@ if (argumentsArr.length < 1) {
     console.log('arguments error!');
     return;
 }
-
+console.log(argumentsArr);
 //var dir = '/Work/StromWorkSpace/alog-redis/logData/';
 var dir = '/mnt/farmweblog3/monthlogin/';
 var dateIndex = 0;
@@ -29,11 +29,13 @@ var allacc = 0;
 
 dateIndex = 0;
 start();
-setInterval(debuginfo, 4000);
+setInterval(debuginfo, 10000);
 //开始执行
 function start() {
     if (dateIndex == argumentsArr.length) {
         console.log('Over:' + new Date().toString());
+        process.exit();
+        return;
     }
     dateDir = argumentsArr[dateIndex];
     langs = fs.readdirSync(dir + dateDir + '/');
@@ -42,10 +44,11 @@ function start() {
         db.close();
     }
     db = new sqlite3.Database(dateDir + '.db');
+    i = 0;
     nextfile();
 }
 function debuginfo() {
-    console.log('men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 4) + ' -all:' + allacc);
+    console.log('dateDir:' + argumentsArr[dateIndex] + ' men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 10) + ' -all:' + allacc);
     acc = 0;
 }
 function exec(strs, cb) {
@@ -96,8 +99,8 @@ function exec(strs, cb) {
 //下个文件
 function nextfile() {
     if (i == langs.length) {
-        console.log('Over');
-        process.exit();
+        dateIndex++;
+        start();
         return 0;
     }
     var path = dir + dateDir + '/' + langs[i] + '/' + dateDir + '_monthlogin_' + langs[i] + '.log';
@@ -110,7 +113,7 @@ function nextfile() {
         }
         if (row.length == 0) {
             db.run("CREATE TABLE " + 'tb_' + langs[i] + " (uid varchar(255), data text)");
-            console.log('创建表: tb_' + langs[i]);
+            console.log('CREATE TABLE: tb_' + langs[i]);
         }
         i++;
         openfile(path);
@@ -138,7 +141,7 @@ function openfile(filename) {
 function ignoreArr(arr) {
     var ret = [];
     for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == '.DS_Store') {
+        if (arr[i] == '.DS_Store' || arr[i] == 'test' || arr[i] == 'err') {
             continue;
         }
         ret.push(arr[i]);
