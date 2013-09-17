@@ -25,6 +25,7 @@ var acc = 0;
 var i = 0;
 var db;
 var sleepacc = 0;
+var allacc = 0;
 
 dateIndex = 0;
 start();
@@ -44,7 +45,7 @@ function start() {
     nextfile();
 }
 function debuginfo() {
-    console.log('men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 4));
+    console.log('men:' + util.inspect(process.memoryUsage()) + ' - qps:' + Math.round(acc / 4) + ' -all:' + allacc);
     acc = 0;
 }
 function exec(strs, cb) {
@@ -77,9 +78,10 @@ function exec(strs, cb) {
         db.run("INSERT INTO tb_" + lang + " VALUES (?,?)", [uid, JSON.stringify(item)]);
         acc++;
         sleepacc++;
+        allacc++;
         if (sleepacc > 999) {
             sleepacc = 0;
-            setTimeout(cb, 1000);
+            setTimeout(cb, 100);
         } else {
             cb();
         }
@@ -99,7 +101,7 @@ function nextfile() {
         return 0;
     }
     var path = dir + dateDir + '/' + langs[i] + '/' + dateDir + '_monthlogin_' + langs[i] + '.log';
-
+    allacc = 0;
     console.log("Start read:" + path);
     db.all("select * from sqlite_master where name=?", ['tb_' + langs[i]], function (err, row) {
         if (err) {
