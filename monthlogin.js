@@ -72,6 +72,7 @@ function exe(req, res, rf, data) {
         return 0;
     }
     getdb(lang, uid, function (err, data) {
+        console.log('i come back');
         if (err) {
             console.log(err);
             return 0;
