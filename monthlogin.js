@@ -8,7 +8,7 @@
 var query = require("querystring");
 var sqlite3 = require('sqlite3').verbose();
 var fs = require("fs");
-var dbDir = './';
+var dbDir = './db/';
 
 function getdb(lang, uid, cb) {
     var dbPath = dbDir + lang + '.db';
