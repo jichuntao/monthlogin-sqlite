@@ -57,10 +57,11 @@ function exe(req, res, rf, data) {
 
     res.writeHead(200, {"Content-Type": "text/html"});
     res.write('<html><head><meta charset="utf-8"/><title>monthlogin</title></head><body>');
-    res.write('waiting....');
+    res.write('lang:' + lang + "  -  uid:" + uid + "<br>");
+    res.write('waiting....<br>');
     if (!lang || !uid) {
         res.write('arguments error!');
-        res.write('<a href="/">back<a>');
+        res.write('<a href="/">Back<a>');
         res.end('</body></html>');
         return 0;
     }
