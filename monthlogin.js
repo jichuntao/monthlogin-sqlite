@@ -77,7 +77,7 @@ function exe(req, res, rf, data) {
             var sarr = sortBy(tarr, 'logtime', false);
             resultStr = '<table width="100%" border="1" bordercolor="#000000" cellspacing="0px" style="border-collapse:collapse">\n';
             resultStr += '<tr bordercolor="#FFFFFF" bgcolor="#ffffff">';
-            resultStr += '<td>当地时间：</td>';
+            resultStr += '<td width="100">当地时间：</td>';
             resultStr += '<td>动作：</td>';
             resultStr += '<td>登陆天数：</td>';
             resultStr += '<td>购买天数：</td>';
