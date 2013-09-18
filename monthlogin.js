@@ -8,7 +8,7 @@
 var query = require("querystring");
 var sqlite3 = require('sqlite3').verbose();
 var fs = require("fs");
-var dbDir = './db/';
+var dbDir = './';
 
 function getdb(lang, uid, cb) {
     var dbPath = dbDir + lang + '.db';
@@ -21,6 +21,7 @@ function getdb(lang, uid, cb) {
     db.serialize(function () {
         db.all("select name from sqlite_master", function (err, row) {
             if (err || row.length < 1) {
+                db.close();
                 return cb(null, null);
             }
             var readAcc = 0;
@@ -31,6 +32,10 @@ function getdb(lang, uid, cb) {
                 db.all("select data from " + obj.name + " where uid=?", [uid], function (err, row) {
                     readAcc++;
                     if (err) {
+                        if (allTables == readAcc) {
+                            db.close();
+                            cb(null, result);
+                        }
                         return;
                     }
                     for (var k = 0; k < row.length; k++) {
@@ -42,6 +47,7 @@ function getdb(lang, uid, cb) {
                         }
                     }
                     if (allTables == readAcc) {
+                        db.close();
                         cb(null, result);
                     }
                 });
@@ -54,14 +60,14 @@ function exe(req, res, rf, data) {
     var qu = query.parse(data);
     var lang = qu['lang'];
     var uid = qu['uid'];
-
+    console.log(qu);
     res.writeHead(200, {"Content-Type": "text/html"});
     res.write('<html><head><meta charset="utf-8"/><title>monthlogin</title></head><body>');
-    res.write('lang:' + lang + "  -  uid:" + uid + "<br>");
-    res.write('waiting....<br>');
+    res.write('查询:' + lang + "_" + uid + "<br><br>");
+    res.write('Waiting....<br><br>');
     if (!lang || !uid) {
         res.write('arguments error!');
-        res.write('<a href="/">Back<a>');
+        res.write('<a href="javascript:history.go(-1)">Back<a>');
         res.end('</body></html>');
         return 0;
     }
