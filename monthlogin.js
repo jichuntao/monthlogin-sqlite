@@ -9,7 +9,7 @@ var query = require("querystring");
 var sqlite3 = require('sqlite3').verbose();
 var fs = require("fs");
 var dbDir = './db/';
-
+var islock = false;
 function getdb(lang, uid, cb) {
     var dbPath = dbDir + lang + '.db';
     var db;
@@ -71,8 +71,15 @@ function exe(req, res, rf, data) {
         res.end('</body></html>');
         return 0;
     }
+    if(islock){
+        res.write("服务器同时只能接受一个查询!");
+        res.write('<a href="javascript:history.go(-1)">Back<a>');
+        res.end('</body></html>');
+        return 0;
+    }
+    islock=true;
     getdb(lang, uid, function (err, data) {
-        console.log('i come back');
+        islock=false;
         if (err) {
             console.log(err);
             return 0;
