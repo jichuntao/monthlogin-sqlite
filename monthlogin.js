@@ -71,15 +71,15 @@ function exe(req, res, rf, data) {
         res.end('</body></html>');
         return 0;
     }
-    if(islock){
+    if (islock) {
         res.write("服务器同时只能接受一个查询!");
         res.write('<a href="javascript:history.go(-1)">Back<a>');
         res.end('</body></html>');
         return 0;
     }
-    islock=true;
+    islock = true;
     getdb(lang, uid, function (err, data) {
-        islock=false;
+        islock = false;
         if (err) {
             console.log(err);
             return 0;
@@ -97,7 +97,7 @@ function exe(req, res, rf, data) {
             resultStr += '<td>动作：</td>';
             resultStr += '<td>登陆天数：</td>';
             resultStr += '<td>购买天数：</td>';
-            resultStr += '<td>鼠标事件：</td>';
+            resultStr += '<td>数据：</td>';
             resultStr += '</tr>';
             for (var i = 0; i < sarr.length; i++) {
                 var rstr = '';
@@ -113,12 +113,15 @@ function exe(req, res, rf, data) {
                     rstr += '<td>' + getDisplay(sarr[i].data.signdays.toString(2), true) + '</td>';
                     rstr += '<td>' + getDisplay(sarr[i].data.rcsigndays.toString(2), false) + '</td>';
                 } else {
-                    rstr += '<td>0</td>';
-                    rstr += '<td>0</td>';
+                    rstr += '<td></td>';
+                    rstr += '<td></td>';
                 }
                 if (sarr[i].mouse) {
                     rstr += '<td>' + JSON.stringify(sarr[i].mouse) + '</td>';
-                } else {
+                } else if (sarr[i].data && !sarr[i].data.uid) {
+                    rstr += '<td>' + JSON.stringify(sarr[i].data) + '</td>';
+                }
+                else {
                     rstr += '<td></td>';
                 }
                 rstr += '</tr>';
