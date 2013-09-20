@@ -15,8 +15,8 @@ if (argumentsArr.length < 1) {
     return;
 }
 console.log(argumentsArr);
-//var dir = '/Work/StromWorkSpace/alog-redis/logData/';
-var dir = '/mnt/farmweblog3/monthlogin/';
+var dir = '/Work/StromWorkSpace/alog-redis/logData/';
+//var dir = '/mnt/farmweblog3/monthlogin/';
 var dateIndex = 0;
 var dateDir;
 var langs;
@@ -106,7 +106,7 @@ function nextfile() {
     var path = dir + dateDir + '/' + langs[i] + '/' + dateDir + '_monthlogin_' + langs[i] + '.log';
     allacc = 0;
     console.log("Start read:" + path);
-    db.all("select * from sqlite_master where name=?", ['tb_' + langs[i]], function (err, row) {
+    db.all("select * from sqlite_master where name=?", ['tb_' + dateDir], function (err, row) {
         if (err) {
             console.log('err1' + err);
             process.exit();
