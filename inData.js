@@ -15,8 +15,8 @@ if (argumentsArr.length < 1) {
     return;
 }
 console.log(argumentsArr);
-var dir = '/Work/StromWorkSpace/alog-redis/logData/';
-//var dir = '/mnt/farmweblog3/monthlogin/';
+//var dir = '/Work/StromWorkSpace/alog-redis/logData/';
+var dir = '/mnt/farmweblog3/monthlogin/';
 var dateIndex = 0;
 var dateDir;
 var langs;
