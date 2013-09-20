@@ -61,7 +61,8 @@ function exec(strs, cb) {
         var ldata = obj.data;
         var mouse = obj.mouse;
         if (!logtime || !lang || !uid || !servertime || !clienttime || !action) {
-            return 0;
+            console.log('error ' + strs);
+            return  cb();
         }
 
         var item = {
@@ -75,12 +76,10 @@ function exec(strs, cb) {
             'mouse': mouse
         };
         db.run("INSERT INTO tb_" + dateDir + " VALUES (?,?)", [uid, JSON.stringify(item)]);
-        acc++;
         sleepacc++;
-        allacc++;
         if (sleepacc > 999) {
             sleepacc = 0;
-            setTimeout(cb, 100);
+            setTimeout(cb, 1);
         } else {
             cb();
         }
@@ -126,6 +125,7 @@ function nextfile() {
 function openfile(filename) {
     lineReader.eachLine(filename, function (line, last, cb) {
         acc++;
+        allacc++;
         exec(line, function () {
             if (last) {
                 cb(false);
