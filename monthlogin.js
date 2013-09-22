@@ -8,21 +8,24 @@
 var query = require("querystring");
 var sqlite3 = require('sqlite3').verbose();
 var fs = require("fs");
-var dbDir = './db/';
+var dbDir = './';
 var islock = false;
 function getdb(lang, uid, cb) {
     var dbPath = dbDir + lang + '.db';
     var db;
-    if (fs.existsSync(dbPath)) {
+    if (fs.existsSync(dbPath + '-journal')) {
+        return cb('database is locked 正在导入数据', null);
+    }
+    else if (fs.existsSync(dbPath)) {
         db = new sqlite3.Database(dbPath);
     } else {
-        return cb(null, null);
+        return cb('database no found!', null);
     }
     db.serialize(function () {
         db.all("select name from sqlite_master", function (err, row) {
             if (err || row.length < 1) {
                 db.close();
-                return cb(null, null);
+                return cb(err, null);
             }
             var readAcc = 0;
             var allTables = row.length;
@@ -81,7 +84,8 @@ function exe(req, res, rf, data) {
     getdb(lang, uid, function (err, data) {
         islock = false;
         if (err) {
-            console.log(err);
+            res.write(err);
+            res.end('</body></html>');
             return 0;
         }
         res.write('<a href="/">back<a><br><br>');
