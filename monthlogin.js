@@ -75,8 +75,8 @@ function exe(req, res, rf, data) {
         return 0;
     }
     if (islock) {
-        res.write("服务器同时只能接受一个查询!");
-        res.write('<a href="javascript:history.go(-1)">Back<a>');
+        res.write("服务器同时只能接受一个查询!<br>");
+        res.write('<a href="javascript:history.go(-1)">Back<a><br>');
         res.end('</body></html>');
         return 0;
     }
@@ -84,7 +84,7 @@ function exe(req, res, rf, data) {
     getdb(lang, uid, function (err, data) {
         islock = false;
         if (err) {
-            res.write('<a href="javascript:history.go(-1)">Back<a>');
+            res.write('<a href="javascript:history.go(-1)">Back<a><br>');
             res.write(err);
             res.end('</body></html>');
             return 0;
