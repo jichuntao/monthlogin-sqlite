@@ -84,11 +84,12 @@ function exe(req, res, rf, data) {
     getdb(lang, uid, function (err, data) {
         islock = false;
         if (err) {
+            res.write('<a href="javascript:history.go(-1)">Back<a>');
             res.write(err);
             res.end('</body></html>');
             return 0;
         }
-        res.write('<a href="/">back<a><br><br>');
+        res.write('<a href="javascript:history.go(-1)">Back<a>');
         if (!data) {
             res.write('nofound!');
         } else {
