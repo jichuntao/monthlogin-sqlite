@@ -116,9 +116,12 @@ function exe(req, res, rf, data) {
                 rstr += '<td>' + sarr[i].action + '</td>';
                 if (sarr[i].data && sarr[i].data.hasOwnProperty('signdays')) {
                     rstr += '<td>' + getDisplay(sarr[i].data.signdays.toString(2), true) + '</td>';
-                    rstr += '<td>' + getDisplay(sarr[i].data.rcsigndays.toString(2), false) + '</td>';
                 } else {
                     rstr += '<td></td>';
+                }
+                if (sarr[i].data && sarr[i].data.hasOwnProperty('rcsigndays')) {
+                    rstr += '<td>' + getDisplay(sarr[i].data.rcsigndays.toString(2), false) + '</td>';
+                } else {
                     rstr += '<td></td>';
                 }
                 if (sarr[i].mouse) {
